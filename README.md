@@ -146,31 +146,13 @@ To enable port changes, set the `CHANGE_CONTAINER_PORTS` environment variable to
 
 `PLATFORM_NAME=Amazon EKS`
 
-`PLATFORM_LOGO_FILE=/usr/share/nginx/html/platform/platform-logo.svg`  (ConfigMap file mount)
+Default logo file paths are already baked into the image:
+- `/usr/share/nginx/html/platform/platform-logo-light.svg`
+- `/usr/share/nginx/html/platform/platform-logo-dark.svg`
+- `/usr/share/nginx/html/platform/platform-logo2-light.svg`
+- `/usr/share/nginx/html/platform/platform-logo2-dark.svg`
 
-`PLATFORM_LOGO_WEB_PATH=/platform/platform-logo.svg`  (Recommended for Kubernetes)
-
-`PLATFORM_LOGO_SVG=<svg ...>...</svg>`  (Use env var if you prefer inline SVG text)
-
-For automatic dark/light switch:
-
-`PLATFORM_LOGO_FILE_LIGHT=/usr/share/nginx/html/platform/platform-logo-light.svg`
-
-`PLATFORM_LOGO_FILE_DARK=/usr/share/nginx/html/platform/platform-logo-dark.svg`
-
-`PLATFORM_LOGO_WEB_PATH_LIGHT=/platform/platform-logo-light.svg`
-
-`PLATFORM_LOGO_WEB_PATH_DARK=/platform/platform-logo-dark.svg`
-
-Second logo (optional):
-
-`PLATFORM_LOGO2_FILE_LIGHT=/usr/share/nginx/html/platform/platform-logo2-light.svg`
-
-`PLATFORM_LOGO2_FILE_DARK=/usr/share/nginx/html/platform/platform-logo2-dark.svg`
-
-`PLATFORM_LOGO2_WEB_PATH_LIGHT=/platform/platform-logo2-light.svg`
-
-`PLATFORM_LOGO2_WEB_PATH_DARK=/platform/platform-logo2-dark.svg`
+So in Kubernetes, you usually only need to set `PLATFORM_NAME` and mount the SVG files with the above names.
 
 Kubernetes example:
 
@@ -216,24 +198,6 @@ spec:
             configMapKeyRef:
               name: speedtest-platform
               key: PLATFORM_NAME
-        - name: PLATFORM_LOGO_FILE
-          value: /usr/share/nginx/html/platform/platform-logo-light.svg
-        - name: PLATFORM_LOGO_FILE_LIGHT
-          value: /usr/share/nginx/html/platform/platform-logo-light.svg
-        - name: PLATFORM_LOGO_FILE_DARK
-          value: /usr/share/nginx/html/platform/platform-logo-dark.svg
-        - name: PLATFORM_LOGO_WEB_PATH_LIGHT
-          value: /platform/platform-logo-light.svg
-        - name: PLATFORM_LOGO_WEB_PATH_DARK
-          value: /platform/platform-logo-dark.svg
-        - name: PLATFORM_LOGO2_FILE_LIGHT
-          value: /usr/share/nginx/html/platform/platform-logo2-light.svg
-        - name: PLATFORM_LOGO2_FILE_DARK
-          value: /usr/share/nginx/html/platform/platform-logo2-dark.svg
-        - name: PLATFORM_LOGO2_WEB_PATH_LIGHT
-          value: /platform/platform-logo2-light.svg
-        - name: PLATFORM_LOGO2_WEB_PATH_DARK
-          value: /platform/platform-logo2-dark.svg
         volumeMounts:
         - name: platform-logo
           mountPath: /usr/share/nginx/html/platform
@@ -251,3 +215,6 @@ spec:
           - key: platform-logo2-dark.svg
             path: platform-logo2-dark.svg
 ````
+
+Override note:
+- If needed, you can still override with `PLATFORM_LOGO_*` / `PLATFORM_LOGO2_*` env vars.
