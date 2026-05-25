@@ -141,3 +141,59 @@ To enable port changes, set the `CHANGE_CONTAINER_PORTS` environment variable to
 - `SET_SERVER_NAME` Display the server name on the UI.
   
 `SET_SERVER_NAME=HOME-NAS` 
+
+- Show platform badge text/logo (for demo environments such as Kubernetes).
+
+`PLATFORM_NAME=Amazon EKS`
+
+`PLATFORM_LOGO_FILE=/config/platform-logo.svg`  (Recommended for ConfigMap file mount)
+
+Note: If copy permission is restricted, mount the logo under `/usr/share/nginx/html/...` and set that path directly.  
+Example: `PLATFORM_LOGO_FILE=/usr/share/nginx/html/assets/images/platform-logo.svg`
+
+`PLATFORM_LOGO_SVG=<svg ...>...</svg>`  (Use env var if you prefer inline SVG text)
+
+Kubernetes example:
+
+````yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: speedtest-platform
+data:
+  PLATFORM_NAME: "Amazon EKS"
+  platform-logo.svg: |
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <circle cx="32" cy="32" r="28" fill="#0f62fe"/>
+      <path d="M20 24h24v16H20z" fill="#fff"/>
+    </svg>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: speedtest
+spec:
+  template:
+    spec:
+      containers:
+      - name: speedtest
+        image: your-registry/speedtest:latest
+        env:
+        - name: PLATFORM_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: speedtest-platform
+              key: PLATFORM_NAME
+        - name: PLATFORM_LOGO_FILE
+          value: /config/platform-logo.svg
+        volumeMounts:
+        - name: platform-logo
+          mountPath: /config
+      volumes:
+      - name: platform-logo
+        configMap:
+          name: speedtest-platform
+          items:
+          - key: platform-logo.svg
+            path: platform-logo.svg
+````
