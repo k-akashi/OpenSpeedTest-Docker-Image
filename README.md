@@ -162,6 +162,16 @@ For automatic dark/light switch:
 
 `PLATFORM_LOGO_WEB_PATH_DARK=/platform/platform-logo-dark.svg`
 
+Second logo (optional):
+
+`PLATFORM_LOGO2_FILE_LIGHT=/usr/share/nginx/html/platform/platform-logo2-light.svg`
+
+`PLATFORM_LOGO2_FILE_DARK=/usr/share/nginx/html/platform/platform-logo2-dark.svg`
+
+`PLATFORM_LOGO2_WEB_PATH_LIGHT=/platform/platform-logo2-light.svg`
+
+`PLATFORM_LOGO2_WEB_PATH_DARK=/platform/platform-logo2-dark.svg`
+
 Kubernetes example:
 
 ````yaml
@@ -180,6 +190,14 @@ data:
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
       <circle cx="32" cy="32" r="28" fill="#111"/>
       <path d="M20 24h24v16H20z" fill="#fff"/>
+    </svg>
+  platform-logo2-light.svg: |
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <rect x="8" y="18" width="48" height="28" rx="6" fill="#0f62fe"/>
+    </svg>
+  platform-logo2-dark.svg: |
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <rect x="8" y="18" width="48" height="28" rx="6" fill="#fff"/>
     </svg>
 ---
 apiVersion: apps/v1
@@ -208,6 +226,14 @@ spec:
           value: /platform/platform-logo-light.svg
         - name: PLATFORM_LOGO_WEB_PATH_DARK
           value: /platform/platform-logo-dark.svg
+        - name: PLATFORM_LOGO2_FILE_LIGHT
+          value: /usr/share/nginx/html/platform/platform-logo2-light.svg
+        - name: PLATFORM_LOGO2_FILE_DARK
+          value: /usr/share/nginx/html/platform/platform-logo2-dark.svg
+        - name: PLATFORM_LOGO2_WEB_PATH_LIGHT
+          value: /platform/platform-logo2-light.svg
+        - name: PLATFORM_LOGO2_WEB_PATH_DARK
+          value: /platform/platform-logo2-dark.svg
         volumeMounts:
         - name: platform-logo
           mountPath: /usr/share/nginx/html/platform
@@ -220,4 +246,8 @@ spec:
             path: platform-logo-light.svg
           - key: platform-logo-dark.svg
             path: platform-logo-dark.svg
+          - key: platform-logo2-light.svg
+            path: platform-logo2-light.svg
+          - key: platform-logo2-dark.svg
+            path: platform-logo2-dark.svg
 ````

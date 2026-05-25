@@ -56,8 +56,12 @@ fi
 
 PLATFORM_LOGO_LIGHT_PATH="/usr/share/nginx/html/assets/images/platform-logo-light.svg"
 PLATFORM_LOGO_DARK_PATH="/usr/share/nginx/html/assets/images/platform-logo-dark.svg"
+PLATFORM_LOGO2_LIGHT_PATH="/usr/share/nginx/html/assets/images/platform-logo2-light.svg"
+PLATFORM_LOGO2_DARK_PATH="/usr/share/nginx/html/assets/images/platform-logo2-dark.svg"
 platform_logo_src_light="assets/images/platform-logo.svg"
 platform_logo_src_dark="assets/images/platform-logo.svg"
+platform_logo2_src_light="$platform_logo_src_light"
+platform_logo2_src_dark="$platform_logo_src_dark"
 
 platform_name="${PLATFORM_NAME:-Demo Platform}"
 escaped_platform_name=$(printf '%s' "$platform_name" | sed 's/[\/&]/\\&/g')
@@ -102,11 +106,17 @@ resolve_platform_logo_src() {
 
 platform_logo_src_light=$(resolve_platform_logo_src "${PLATFORM_LOGO_FILE_LIGHT:-$PLATFORM_LOGO_FILE}" "${PLATFORM_LOGO_SVG_LIGHT:-$PLATFORM_LOGO_SVG}" "${PLATFORM_LOGO_WEB_PATH_LIGHT:-$PLATFORM_LOGO_WEB_PATH}" "$PLATFORM_LOGO_LIGHT_PATH" "assets/images/platform-logo.svg")
 platform_logo_src_dark=$(resolve_platform_logo_src "${PLATFORM_LOGO_FILE_DARK:-$PLATFORM_LOGO_FILE}" "${PLATFORM_LOGO_SVG_DARK:-$PLATFORM_LOGO_SVG}" "${PLATFORM_LOGO_WEB_PATH_DARK:-$PLATFORM_LOGO_WEB_PATH}" "$PLATFORM_LOGO_DARK_PATH" "$platform_logo_src_light")
+platform_logo2_src_light=$(resolve_platform_logo_src "${PLATFORM_LOGO2_FILE_LIGHT:-$PLATFORM_LOGO2_FILE}" "${PLATFORM_LOGO2_SVG_LIGHT:-$PLATFORM_LOGO2_SVG}" "${PLATFORM_LOGO2_WEB_PATH_LIGHT:-$PLATFORM_LOGO2_WEB_PATH}" "$PLATFORM_LOGO2_LIGHT_PATH" "$platform_logo_src_light")
+platform_logo2_src_dark=$(resolve_platform_logo_src "${PLATFORM_LOGO2_FILE_DARK:-$PLATFORM_LOGO2_FILE}" "${PLATFORM_LOGO2_SVG_DARK:-$PLATFORM_LOGO2_SVG}" "${PLATFORM_LOGO2_WEB_PATH_DARK:-$PLATFORM_LOGO2_WEB_PATH}" "$PLATFORM_LOGO2_DARK_PATH" "$platform_logo2_src_light")
 
 escaped_platform_logo_src_light=$(printf '%s' "$platform_logo_src_light" | sed 's/[\/&]/\\&/g')
 escaped_platform_logo_src_dark=$(printf '%s' "$platform_logo_src_dark" | sed 's/[\/&]/\\&/g')
+escaped_platform_logo2_src_light=$(printf '%s' "$platform_logo2_src_light" | sed 's/[\/&]/\\&/g')
+escaped_platform_logo2_src_dark=$(printf '%s' "$platform_logo2_src_dark" | sed 's/[\/&]/\\&/g')
 sed -i "s/__PLATFORM_LOGO_SRC_LIGHT__/${escaped_platform_logo_src_light}/g" "${INDEX_HTML}"
 sed -i "s/__PLATFORM_LOGO_SRC_DARK__/${escaped_platform_logo_src_dark}/g" "${INDEX_HTML}"
+sed -i "s/__PLATFORM_LOGO2_SRC_LIGHT__/${escaped_platform_logo2_src_light}/g" "${INDEX_HTML}"
+sed -i "s/__PLATFORM_LOGO2_SRC_DARK__/${escaped_platform_logo2_src_dark}/g" "${INDEX_HTML}"
 
 if [ "$ALLOW_ONLY" ]; then
 

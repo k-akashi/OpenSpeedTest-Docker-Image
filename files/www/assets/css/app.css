@@ -51,7 +51,7 @@ body {
   transform: translateX(-50%);
   display: inline-flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   padding: 10px 20px;
   border: 1px solid rgba(20, 176, 254, 0.55);
   border-radius: 999px;
@@ -67,9 +67,15 @@ body {
   animation: platform-badge-pop 380ms ease-out;
 }
 
+.platform-badge__logos {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .platform-badge__logo {
-  width: 96px;
-  height: 36px;
+  width: 92px;
+  height: 35px;
   object-fit: contain;
 }
 
@@ -430,12 +436,16 @@ color: #14b0fe;
     box-sizing: border-box;
     font-size: 16px;
     padding: 10px 12px;
-    gap: 10px;
+    gap: 12px;
+  }
+
+  .platform-badge__logos {
+    gap: 8px;
   }
 
   .platform-badge__logo {
-    width: 120px;
-    height: 45px;
+    width: 110px;
+    height: 42px;
   }
 }
 
@@ -444,12 +454,16 @@ color: #14b0fe;
     top: 10px;
     font-size: 14px;
     padding: 9px 10px;
-    gap: 8px;
+    gap: 6px;
+  }
+
+  .platform-badge__logos {
+    gap: 6px;
   }
 
   .platform-badge__logo {
-    width: 108px;
-    height: 41px;
+    width: 95px;
+    height: 36px;
   }
 
   .Credits{

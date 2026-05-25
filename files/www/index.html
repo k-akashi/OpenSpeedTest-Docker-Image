@@ -23,10 +23,16 @@
 </head>
 <body>
   <div class="platform-badge" role="note" aria-label="Runtime platform">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="__PLATFORM_LOGO_SRC_DARK__">
-      <img class="platform-badge__logo" src="__PLATFORM_LOGO_SRC_LIGHT__" alt="Platform logo">
-    </picture>
+    <div class="platform-badge__logos" aria-hidden="true">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="__PLATFORM_LOGO_SRC_DARK__">
+        <img class="platform-badge__logo" src="__PLATFORM_LOGO_SRC_LIGHT__" alt="">
+      </picture>
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="__PLATFORM_LOGO2_SRC_DARK__">
+        <img class="platform-badge__logo" src="__PLATFORM_LOGO2_SRC_LIGHT__" alt="">
+      </picture>
+    </div>
     <span class="platform-badge__text">Running on <strong>__PLATFORM_NAME__</strong></span>
   </div>
   <script type="text/javascript">
