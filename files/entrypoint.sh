@@ -54,39 +54,59 @@ if [ "$SET_SERVER_NAME" ]; then
       fi
 fi
 
-PLATFORM_LOGO_PATH="/usr/share/nginx/html/assets/images/platform-logo.svg"
-platform_logo_src="assets/images/platform-logo.svg"
+PLATFORM_LOGO_LIGHT_PATH="/usr/share/nginx/html/assets/images/platform-logo-light.svg"
+PLATFORM_LOGO_DARK_PATH="/usr/share/nginx/html/assets/images/platform-logo-dark.svg"
+platform_logo_src_light="assets/images/platform-logo.svg"
+platform_logo_src_dark="assets/images/platform-logo.svg"
 
-platform_name="${PLATFORM_NAME:-基盤名}"
+platform_name="${PLATFORM_NAME:-Demo Platform}"
 escaped_platform_name=$(printf '%s' "$platform_name" | sed 's/[\/&]/\\&/g')
 sed -i "s/__PLATFORM_NAME__/${escaped_platform_name}/g" "${INDEX_HTML}"
 
-if [ -n "$PLATFORM_LOGO_FILE" ] && [ -f "$PLATFORM_LOGO_FILE" ]; then
-  case "$PLATFORM_LOGO_FILE" in
-    /usr/share/nginx/html/*)
-      platform_logo_src="${PLATFORM_LOGO_FILE#/usr/share/nginx/html/}"
-      echo "Using platform logo from docroot file: ${platform_logo_src}"
-      ;;
-    *)
-      if cp "$PLATFORM_LOGO_FILE" "$PLATFORM_LOGO_PATH"; then
-        echo "Platform logo copied from PLATFORM_LOGO_FILE"
-      else
-        echo "Failed to load PLATFORM_LOGO_FILE: $PLATFORM_LOGO_FILE"
-        echo "Tip: mount logo file under /usr/share/nginx/html and set PLATFORM_LOGO_WEB_PATH."
-      fi
-      ;;
-  esac
-elif [ -n "$PLATFORM_LOGO_SVG" ]; then
-  printf '%s\n' "$PLATFORM_LOGO_SVG" > "$PLATFORM_LOGO_PATH"
-  echo "Platform logo updated from PLATFORM_LOGO_SVG"
-fi
+resolve_platform_logo_src() {
+  logo_file="$1"
+  logo_svg="$2"
+  logo_web_path="$3"
+  logo_copy_target="$4"
+  logo_fallback="$5"
+  logo_src="$logo_fallback"
 
-if [ -n "$PLATFORM_LOGO_WEB_PATH" ]; then
-  platform_logo_src="${PLATFORM_LOGO_WEB_PATH#/}"
-  echo "Using platform logo from PLATFORM_LOGO_WEB_PATH: ${platform_logo_src}"
-fi
-escaped_platform_logo_src=$(printf '%s' "$platform_logo_src" | sed 's/[\/&]/\\&/g')
-sed -i "s/__PLATFORM_LOGO_SRC__/${escaped_platform_logo_src}/g" "${INDEX_HTML}"
+  if [ -n "$logo_file" ] && [ -f "$logo_file" ]; then
+    case "$logo_file" in
+      /usr/share/nginx/html/*)
+        logo_src="${logo_file#/usr/share/nginx/html/}"
+        echo "Using platform logo from docroot file: ${logo_src}" >&2
+        ;;
+      *)
+        if cp "$logo_file" "$logo_copy_target"; then
+          logo_src="${logo_copy_target#/usr/share/nginx/html/}"
+          echo "Platform logo copied from file: $logo_file" >&2
+        else
+          echo "Failed to load logo file: $logo_file" >&2
+        fi
+        ;;
+    esac
+  elif [ -n "$logo_svg" ]; then
+    printf '%s\n' "$logo_svg" > "$logo_copy_target"
+    logo_src="${logo_copy_target#/usr/share/nginx/html/}"
+    echo "Platform logo updated from SVG text" >&2
+  fi
+
+  if [ -n "$logo_web_path" ]; then
+    logo_src="${logo_web_path#/}"
+    echo "Using platform logo from web path: ${logo_src}" >&2
+  fi
+
+  printf '%s' "$logo_src"
+}
+
+platform_logo_src_light=$(resolve_platform_logo_src "${PLATFORM_LOGO_FILE_LIGHT:-$PLATFORM_LOGO_FILE}" "${PLATFORM_LOGO_SVG_LIGHT:-$PLATFORM_LOGO_SVG}" "${PLATFORM_LOGO_WEB_PATH_LIGHT:-$PLATFORM_LOGO_WEB_PATH}" "$PLATFORM_LOGO_LIGHT_PATH" "assets/images/platform-logo.svg")
+platform_logo_src_dark=$(resolve_platform_logo_src "${PLATFORM_LOGO_FILE_DARK:-$PLATFORM_LOGO_FILE}" "${PLATFORM_LOGO_SVG_DARK:-$PLATFORM_LOGO_SVG}" "${PLATFORM_LOGO_WEB_PATH_DARK:-$PLATFORM_LOGO_WEB_PATH}" "$PLATFORM_LOGO_DARK_PATH" "$platform_logo_src_light")
+
+escaped_platform_logo_src_light=$(printf '%s' "$platform_logo_src_light" | sed 's/[\/&]/\\&/g')
+escaped_platform_logo_src_dark=$(printf '%s' "$platform_logo_src_dark" | sed 's/[\/&]/\\&/g')
+sed -i "s/__PLATFORM_LOGO_SRC_LIGHT__/${escaped_platform_logo_src_light}/g" "${INDEX_HTML}"
+sed -i "s/__PLATFORM_LOGO_SRC_DARK__/${escaped_platform_logo_src_dark}/g" "${INDEX_HTML}"
 
 if [ "$ALLOW_ONLY" ]; then
 

@@ -152,6 +152,16 @@ To enable port changes, set the `CHANGE_CONTAINER_PORTS` environment variable to
 
 `PLATFORM_LOGO_SVG=<svg ...>...</svg>`  (Use env var if you prefer inline SVG text)
 
+For automatic dark/light switch:
+
+`PLATFORM_LOGO_FILE_LIGHT=/usr/share/nginx/html/platform/platform-logo-light.svg`
+
+`PLATFORM_LOGO_FILE_DARK=/usr/share/nginx/html/platform/platform-logo-dark.svg`
+
+`PLATFORM_LOGO_WEB_PATH_LIGHT=/platform/platform-logo-light.svg`
+
+`PLATFORM_LOGO_WEB_PATH_DARK=/platform/platform-logo-dark.svg`
+
 Kubernetes example:
 
 ````yaml
@@ -161,9 +171,14 @@ metadata:
   name: speedtest-platform
 data:
   PLATFORM_NAME: "Amazon EKS"
-  platform-logo.svg: |
+  platform-logo-light.svg: |
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
       <circle cx="32" cy="32" r="28" fill="#0f62fe"/>
+      <path d="M20 24h24v16H20z" fill="#fff"/>
+    </svg>
+  platform-logo-dark.svg: |
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <circle cx="32" cy="32" r="28" fill="#111"/>
       <path d="M20 24h24v16H20z" fill="#fff"/>
     </svg>
 ---
@@ -184,9 +199,15 @@ spec:
               name: speedtest-platform
               key: PLATFORM_NAME
         - name: PLATFORM_LOGO_FILE
-          value: /usr/share/nginx/html/platform/platform-logo.svg
-        - name: PLATFORM_LOGO_WEB_PATH
-          value: /platform/platform-logo.svg
+          value: /usr/share/nginx/html/platform/platform-logo-light.svg
+        - name: PLATFORM_LOGO_FILE_LIGHT
+          value: /usr/share/nginx/html/platform/platform-logo-light.svg
+        - name: PLATFORM_LOGO_FILE_DARK
+          value: /usr/share/nginx/html/platform/platform-logo-dark.svg
+        - name: PLATFORM_LOGO_WEB_PATH_LIGHT
+          value: /platform/platform-logo-light.svg
+        - name: PLATFORM_LOGO_WEB_PATH_DARK
+          value: /platform/platform-logo-dark.svg
         volumeMounts:
         - name: platform-logo
           mountPath: /usr/share/nginx/html/platform
@@ -195,6 +216,8 @@ spec:
         configMap:
           name: speedtest-platform
           items:
-          - key: platform-logo.svg
-            path: platform-logo.svg
+          - key: platform-logo-light.svg
+            path: platform-logo-light.svg
+          - key: platform-logo-dark.svg
+            path: platform-logo-dark.svg
 ````

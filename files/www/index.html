@@ -23,8 +23,11 @@
 </head>
 <body>
   <div class="platform-badge" role="note" aria-label="Runtime platform">
-    <img class="platform-badge__logo" src="__PLATFORM_LOGO_SRC__" alt="Platform logo">
-    <span class="platform-badge__text">Running on "<strong>__PLATFORM_NAME__</strong>"</span>
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="__PLATFORM_LOGO_SRC_DARK__">
+      <img class="platform-badge__logo" src="__PLATFORM_LOGO_SRC_LIGHT__" alt="Platform logo">
+    </picture>
+    <span class="platform-badge__text">Running on <strong>__PLATFORM_NAME__</strong></span>
   </div>
   <script type="text/javascript">
 /*
