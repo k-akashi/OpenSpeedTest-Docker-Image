@@ -146,10 +146,9 @@ To enable port changes, set the `CHANGE_CONTAINER_PORTS` environment variable to
 
 `PLATFORM_NAME=Amazon EKS`
 
-`PLATFORM_LOGO_FILE=/config/platform-logo.svg`  (Recommended for ConfigMap file mount)
+`PLATFORM_LOGO_FILE=/usr/share/nginx/html/platform/platform-logo.svg`  (ConfigMap file mount)
 
-Note: If copy permission is restricted, mount the logo under `/usr/share/nginx/html/...` and set that path directly.  
-Example: `PLATFORM_LOGO_FILE=/usr/share/nginx/html/assets/images/platform-logo.svg`
+`PLATFORM_LOGO_WEB_PATH=/platform/platform-logo.svg`  (Recommended for Kubernetes)
 
 `PLATFORM_LOGO_SVG=<svg ...>...</svg>`  (Use env var if you prefer inline SVG text)
 
@@ -185,10 +184,12 @@ spec:
               name: speedtest-platform
               key: PLATFORM_NAME
         - name: PLATFORM_LOGO_FILE
-          value: /config/platform-logo.svg
+          value: /usr/share/nginx/html/platform/platform-logo.svg
+        - name: PLATFORM_LOGO_WEB_PATH
+          value: /platform/platform-logo.svg
         volumeMounts:
         - name: platform-logo
-          mountPath: /config
+          mountPath: /usr/share/nginx/html/platform
       volumes:
       - name: platform-logo
         configMap:

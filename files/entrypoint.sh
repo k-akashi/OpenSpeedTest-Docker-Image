@@ -62,25 +62,29 @@ escaped_platform_name=$(printf '%s' "$platform_name" | sed 's/[\/&]/\\&/g')
 sed -i "s/__PLATFORM_NAME__/${escaped_platform_name}/g" "${INDEX_HTML}"
 
 if [ -n "$PLATFORM_LOGO_FILE" ] && [ -f "$PLATFORM_LOGO_FILE" ]; then
-  if cp "$PLATFORM_LOGO_FILE" "$PLATFORM_LOGO_PATH"; then
-    echo "Platform logo updated from PLATFORM_LOGO_FILE"
-  else
-    echo "Failed to copy PLATFORM_LOGO_FILE to default path: $PLATFORM_LOGO_FILE"
-    case "$PLATFORM_LOGO_FILE" in
-      /usr/share/nginx/html/*)
-        platform_logo_src="${PLATFORM_LOGO_FILE#/usr/share/nginx/html/}"
-        echo "Using direct logo path from docroot: ${platform_logo_src}"
-        ;;
-      *)
-        echo "PLATFORM_LOGO_FILE is outside docroot; keeping default logo."
-        ;;
-    esac
-  fi
+  case "$PLATFORM_LOGO_FILE" in
+    /usr/share/nginx/html/*)
+      platform_logo_src="${PLATFORM_LOGO_FILE#/usr/share/nginx/html/}"
+      echo "Using platform logo from docroot file: ${platform_logo_src}"
+      ;;
+    *)
+      if cp "$PLATFORM_LOGO_FILE" "$PLATFORM_LOGO_PATH"; then
+        echo "Platform logo copied from PLATFORM_LOGO_FILE"
+      else
+        echo "Failed to load PLATFORM_LOGO_FILE: $PLATFORM_LOGO_FILE"
+        echo "Tip: mount logo file under /usr/share/nginx/html and set PLATFORM_LOGO_WEB_PATH."
+      fi
+      ;;
+  esac
 elif [ -n "$PLATFORM_LOGO_SVG" ]; then
   printf '%s\n' "$PLATFORM_LOGO_SVG" > "$PLATFORM_LOGO_PATH"
   echo "Platform logo updated from PLATFORM_LOGO_SVG"
 fi
 
+if [ -n "$PLATFORM_LOGO_WEB_PATH" ]; then
+  platform_logo_src="${PLATFORM_LOGO_WEB_PATH#/}"
+  echo "Using platform logo from PLATFORM_LOGO_WEB_PATH: ${platform_logo_src}"
+fi
 escaped_platform_logo_src=$(printf '%s' "$platform_logo_src" | sed 's/[\/&]/\\&/g')
 sed -i "s/__PLATFORM_LOGO_SRC__/${escaped_platform_logo_src}/g" "${INDEX_HTML}"
 

@@ -17,6 +17,7 @@ ENV SET_USER=101
 ENV PLATFORM_NAME=""
 ENV PLATFORM_LOGO_SVG=""
 ENV PLATFORM_LOGO_FILE=""
+ENV PLATFORM_LOGO_WEB_PATH=""
 
 COPY /files/OpenSpeedTest-Server.conf ${CONFIG}
 COPY /files/entrypoint.sh /entrypoint.sh
