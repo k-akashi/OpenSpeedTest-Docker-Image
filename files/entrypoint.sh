@@ -63,9 +63,13 @@ platform_logo_src_dark="assets/images/platform-logo.svg"
 platform_logo2_src_light="$platform_logo_src_light"
 platform_logo2_src_dark="$platform_logo_src_dark"
 
-platform_name="${PLATFORM_NAME:-Demo Platform}"
-escaped_platform_name=$(printf '%s' "$platform_name" | sed 's/[\/&]/\\&/g')
-sed -i "s/__PLATFORM_NAME__/${escaped_platform_name}/g" "${INDEX_HTML}"
+platform_name="${PLATFORM_NAME:-}"
+platform_text_block=""
+if [ -n "$platform_name" ]; then
+  platform_text_block="<span class=\"platform-badge__text\"><strong>${platform_name}</strong></span>"
+fi
+escaped_platform_text_block=$(printf '%s' "$platform_text_block" | sed 's/[\/&]/\\&/g')
+sed -i "s/__PLATFORM_TEXT_BLOCK__/${escaped_platform_text_block}/g" "${INDEX_HTML}"
 
 resolve_platform_logo_src() {
   logo_file="$1"
