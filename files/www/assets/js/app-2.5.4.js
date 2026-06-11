@@ -576,6 +576,19 @@ window.onload = function() {
     } else {
       userAgentString = "Not Found";
     }
+    var platformString = window.navigator.platform || "Not Found";
+    var networkConnection = window.navigator.connection || window.navigator.mozConnection || window.navigator.webkitConnection;
+    var browserRTT = networkConnection && typeof networkConnection.rtt !== "undefined" ? networkConnection.rtt : "";
+    var osName = "Unknown";
+    var detectOS = function(userAgent, platform) {
+      if (/Android/i.test(userAgent)) return "Android";
+      if (/iPhone|iPad|iPod/i.test(userAgent) || (/Mac/i.test(platform) && window.navigator.maxTouchPoints > 1)) return "iOS";
+      if (/Win/i.test(platform)) return "Windows";
+      if (/Mac/i.test(platform)) return "macOS";
+      if (/Linux/i.test(platform)) return "Linux";
+      return "Unknown";
+    };
+    osName = detectOS(userAgentString, platformString);
     var ulFinal = ulDuration * 0.6;
     var dlFinal = dlDuration * 0.6;
     function setFinal() {
@@ -1022,6 +1035,7 @@ window.onload = function() {
             if (saveData) {
               ServerConnect(5);
             }
+            logSpeedTestResult();
           } else {
             ServerConnect(3);
           }
@@ -1419,6 +1433,27 @@ window.onload = function() {
         logData = "r=s";
       }
       xhr.send(logData);
+    };
+    var logSpeedTestResult = function() {
+      if (typeof enableServerSideResultLog === "undefined" || !enableServerSideResultLog) {
+        return;
+      }
+      var logURL = typeof speedTestResultLogURL === "string" ? speedTestResultLogURL : "/speedtest-log";
+      var params = [
+        "d=" + encodeURIComponent(downloadSpeed.toFixed(3)),
+        "u=" + encodeURIComponent(uploadSpeed.toFixed(3)),
+        "p=" + encodeURIComponent(pingEstimate),
+        "brtt=" + encodeURIComponent(browserRTT),
+        "j=" + encodeURIComponent(jitterEstimate),
+        "dd=" + encodeURIComponent((dataUsedfordl / 1048576).toFixed(3)),
+        "ud=" + encodeURIComponent((dataUsedforul / 1048576).toFixed(3)),
+        "os=" + encodeURIComponent(osName),
+        "platform=" + encodeURIComponent(platformString),
+        "ua=" + encodeURIComponent(userAgentString)
+      ].join("&");
+      var separator = logURL.indexOf("?") === -1 ? "?" : "&";
+      var request = new Image();
+      request.src = logURL + separator + params + "&t=" + Date.now();
     };
   };
   OpenSpeedTest.Start = function() {

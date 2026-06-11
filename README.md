@@ -142,6 +142,18 @@ To enable port changes, set the `CHANGE_CONTAINER_PORTS` environment variable to
   
 `SET_SERVER_NAME=HOME-NAS` 
 
+- Log client IP address and speed test results to server logs.
+
+`ENABLE_SPEEDTEST_RESULT_LOG=true`
+
+When enabled, the browser sends the final result to `/speedtest-log`, and NGINX writes one JSON line to stdout. This is useful for Kubernetes because the records can be collected with normal pod logs.
+
+Example log line:
+
+````json
+{"time":"2026-06-11T12:34:56+00:00","client_ip":"10.0.0.10","xff":"203.0.113.10","method":"GET","download_mbps":"945.123","upload_mbps":"512.456","ping_ms":"3.2","browser_rtt_ms":"50","jitter_ms":"0.8","download_mb":"1420.000","upload_mb":"768.000","os":"macOS","platform":"MacIntel","user_agent":"Mozilla/5.0 ...","http_user_agent":"Mozilla/5.0 ...","request_id":"..."}
+````
+
 - Show platform badge text/logo (for demo environments such as Kubernetes).
 
 `PLATFORM_NAME=Amazon EKS`
@@ -198,6 +210,8 @@ spec:
             configMapKeyRef:
               name: speedtest-platform
               key: PLATFORM_NAME
+        - name: ENABLE_SPEEDTEST_RESULT_LOG
+          value: "true"
         volumeMounts:
         - name: platform-logo
           mountPath: /usr/share/nginx/html/platform

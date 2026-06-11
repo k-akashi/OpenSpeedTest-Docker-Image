@@ -33,6 +33,7 @@ ENV PLATFORM_LOGO2_FILE_LIGHT="/usr/share/nginx/html/platform/platform-logo2-lig
 ENV PLATFORM_LOGO2_FILE_DARK="/usr/share/nginx/html/platform/platform-logo2-dark.svg"
 ENV PLATFORM_LOGO2_WEB_PATH_LIGHT="/platform/platform-logo2-light.svg"
 ENV PLATFORM_LOGO2_WEB_PATH_DARK="/platform/platform-logo2-dark.svg"
+ENV ENABLE_SPEEDTEST_RESULT_LOG=false
 
 COPY /files/OpenSpeedTest-Server.conf ${CONFIG}
 COPY /files/entrypoint.sh /entrypoint.sh
