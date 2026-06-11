@@ -1,37 +1,28 @@
 #!/bin/sh
 
+has_config=false
+[ -f "$CONFIG" ] && has_config=true
+
 ip a | egrep -q 'inet6 '
-if [[ $? -ne 0 ]]; then
+if [ "$has_config" = true ] && [[ $? -ne 0 ]]; then
   # IPv6 not enabled
   sed -i '/listen \[::\]:300/d' ${CONFIG}
 fi
 
 ip a | egrep -q 'inet '
-if [[ $? -ne 0 ]]; then
+if [ "$has_config" = true ] && [[ $? -ne 0 ]]; then
   # IPv4 not enabled
   sed -i '/listen 300/d' ${CONFIG}
 fi
 
 
-if [ "$CHANGE_CONTAINER_PORTS" = True ]; then
+if [ "$has_config" = true ] && [ "$CHANGE_CONTAINER_PORTS" = True ]; then
     if [ "$HTTP_PORT" ]; then
         sed -i "s/3000/${HTTP_PORT}/g" ${CONFIG}
-        if [ $? -eq 0 ]; then
-        echo "Changed HTTP container port to " ${HTTP_PORT}
-        else
-        echo "Failed to change HTTP container port to " ${HTTP_PORT}
-        fi        
-         
     fi
 
     if [ "$HTTPS_PORT" ]; then
         sed -i "s/3001/${HTTPS_PORT}/g" ${CONFIG}
-        if [ $? -eq 0 ]; then
-        echo "Changed HTTPS container port to " ${HTTPS_PORT}
-        else
-        echo "Failed to change HTTPS container port to " ${HTTPS_PORT}
-        fi    
-
     fi
 fi
 
@@ -39,11 +30,8 @@ fi
 Verify_TXT_path="/usr/share/nginx/html/Verify.txt"
 
 if [ "$VERIFY_OWNERSHIP" ]; then
-      if [ -f "$Verify_TXT_path" ]; then
-      echo "Verify.txt Found!"
-      else
+      if [ ! -f "$Verify_TXT_path" ]; then
       echo ${VERIFY_OWNERSHIP} > /usr/share/nginx/html/Verify.txt
-      echo "Verify.txt Created!"
       fi
 fi
 
@@ -83,26 +71,20 @@ resolve_platform_logo_src() {
     case "$logo_file" in
       /usr/share/nginx/html/*)
         logo_src="${logo_file#/usr/share/nginx/html/}"
-        echo "Using platform logo from docroot file: ${logo_src}" >&2
         ;;
       *)
         if cp "$logo_file" "$logo_copy_target"; then
           logo_src="${logo_copy_target#/usr/share/nginx/html/}"
-          echo "Platform logo copied from file: $logo_file" >&2
-        else
-          echo "Failed to load logo file: $logo_file" >&2
         fi
         ;;
     esac
   elif [ -n "$logo_svg" ]; then
     printf '%s\n' "$logo_svg" > "$logo_copy_target"
     logo_src="${logo_copy_target#/usr/share/nginx/html/}"
-    echo "Platform logo updated from SVG text" >&2
   fi
 
   if [ -n "$logo_web_path" ]; then
     logo_src="${logo_web_path#/}"
-    echo "Using platform logo from web path: ${logo_src}" >&2
   fi
 
   printf '%s' "$logo_src"
@@ -125,15 +107,13 @@ sed -i "s/__PLATFORM_LOGO2_SRC_DARK__/${escaped_platform_logo2_src_dark}/g" "${I
 case "$ENABLE_SPEEDTEST_RESULT_LOG" in
   true|True|TRUE|1|yes|Yes|YES)
   sed -i "s/__ENABLE_SPEEDTEST_RESULT_LOG__/true/g" "${INDEX_HTML}"
-  echo "Speedtest result logging enabled"
   ;;
   *)
   sed -i "s/__ENABLE_SPEEDTEST_RESULT_LOG__/false/g" "${INDEX_HTML}"
-  echo "Speedtest result logging disabled"
   ;;
 esac
 
-if [ "$ALLOW_ONLY" ]; then
+if [ "$has_config" = true ] && [ "$ALLOW_ONLY" ]; then
 
 allow_only=${ALLOW_ONLY}
 
@@ -155,7 +135,7 @@ pattern="map \$http_origin \$allowed_origin {"
 nginx_block="if (\$allowed_origin = 0) { return 444; }"
 
 if grep -q "$pattern" "$nginx_conf_path"; then
-    echo "Map config found! nginx.conf not modified"
+    :
 else
     while IFS= read -r line; do
 sed -i '/^\s*http\s*{/ {
@@ -166,11 +146,9 @@ sed -i '/^\s*http\s*{/ {
 }' "$nginx_conf_path"
     done < <(printf '%s\n' "$map_config")
         if [ $? -eq 0 ]; then
-    echo "Map config added to nginx.conf"
             if grep -q "$nginx_block" "$CONFIG"; then
-            echo "Block Config found! OpenSpeedTest-Server.conf not modified"
+            :
             else
-            echo "Adding Block Config to OpenSpeedTest-Server.conf"
                     sed -i '/location \/ {/ {
                         a\
                 '"$nginx_block"'
@@ -180,23 +158,14 @@ sed -i '/^\s*http\s*{/ {
                         a\
                 '"$nginx_block"'
                     }' "$CONFIG"
-                    if [ $? -eq 0 ]; then
-                    echo "Added Block to OpenSpeedTest-Server.conf"
-                    else
-                    echo "Failed to Add Block to OpenSpeedTest-Server.conf"
-                    fi
             fi
-    
-
-        else
-    echo "Failed to add map config to nginx.conf"
-fi
+        fi
 fi
 
 fi
 
 
-if [ "$DOMAIN_NAME" ]; then
+if [ "$has_config" = true ] && [ "$DOMAIN_NAME" ]; then
 sed -i "/\bYOURDOMAIN\b/c\ server_name _ localhost ${DOMAIN_NAME};" "${CONFIG}"
 fi
 
@@ -214,15 +183,10 @@ certbot certonly -n --webroot --webroot-path /usr/share/nginx/html --no-redirect
       sed -i "/\bssl_certificate\b/c\ssl_certificate \/var\/log\/letsencrypt\/live\/${DOMAIN_NAME}\/fullchain.pem;" "${CONFIG}"
       sed -i "/\bssl_certificate_key\b/c\ssl_certificate_key \/var\/log\/letsencrypt\/live\/${DOMAIN_NAME}\/privkey.pem;" "${CONFIG}"
       nginx -s reload
-      echo "Let's Encrypt certificate obtained successfully."
       random_minute=$(shuf -i 0-59 -n 1)
       random_hour=$(shuf -i 0-23 -n 1)
       echo "$random_minute $random_hour * * * /renew.sh > /proc/1/fd/1 2>&1" > /etc/crontabs/nginx
-      else
-      echo "letsencrypt Certificates Not Found!"
       fi
-  else
-    echo "Failed to obtain Let's Encrypt certificate."
   fi
 fi
 

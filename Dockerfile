@@ -52,6 +52,9 @@ RUN rm -rf /etc/nginx/conf.d/default.conf \
 	&& chown -R nginx /usr/share/nginx/html/ \
 	&& chmod 755 /usr/share/nginx/html/downloading \
 	&& chmod 755 /usr/share/nginx/html/upload \
+	&& mkdir -p /var/log/nginx \
+	&& chown -R nginx:nginx /var/log/nginx \
+	&& chmod 775 /var/log/nginx \
 	&& chown nginx ${CONFIG} \
 	&& chmod 400 ${CONFIG} \
 	&& chown nginx /etc/nginx/nginx.conf \

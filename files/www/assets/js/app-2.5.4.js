@@ -1439,8 +1439,9 @@ window.onload = function() {
       if (typeof enableServerSideResultLog === "undefined" || !enableServerSideResultLog) {
         return;
       }
-      var logURL = typeof speedTestResultLogURL === "string" ? speedTestResultLogURL : "/speedtest-log";
+      var logURL = typeof speedTestResultLogURL === "string" ? speedTestResultLogURL : "/";
       var params = [
+        "speedtest_result=1",
         "d=" + encodeURIComponent(downloadSpeed.toFixed(3)),
         "u=" + encodeURIComponent(uploadSpeed.toFixed(3)),
         "p=" + encodeURIComponent(pingEstimate),

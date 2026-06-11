@@ -146,7 +146,7 @@ To enable port changes, set the `CHANGE_CONTAINER_PORTS` environment variable to
 
 `ENABLE_SPEEDTEST_RESULT_LOG=true`
 
-When enabled, the browser sends the final result to `/speedtest-log`, and NGINX writes one JSON log line to stdout. This is useful for Kubernetes because the records can be collected with normal pod logs.
+When enabled, the browser sends the final result to `/?speedtest_result=1`, and NGINX writes one JSON log line to both stdout and `/var/log/nginx/speedtest-result.log`. This is useful for Kubernetes pod logs and for syslog agents that tail files.
 
 Example log line:
 
@@ -156,15 +156,15 @@ Example log line:
 
 Custom `OpenSpeedTest-Server.conf` note:
 
-The JSON log format is defined in `/etc/nginx/nginx.conf`, because `log_format` must live in the `http {}` block. If you replace `/etc/nginx/conf.d/OpenSpeedTest-Server.conf` at deploy time, keep the `/speedtest-log` location using `access_log /dev/stdout speedtest_result;`.
+The JSON log format and conditional `access_log` are defined in `/etc/nginx/nginx.conf`, because they can live in the `http {}` block. If you replace `/etc/nginx/conf.d/OpenSpeedTest-Server.conf` at deploy time, avoid overriding access logs with `access_log off;`, otherwise the inherited conditional result log will be disabled.
 
 Quick check:
 
 ````bash
-curl "http://YOUR-SERVER-IP:3000/speedtest-log?d=100&u=50&p=3&brtt=20&j=1&os=macOS&platform=MacIntel"
+curl "http://YOUR-SERVER-IP:3000/?speedtest_result=1&d=100&u=50&p=3&brtt=20&j=1&os=macOS&platform=MacIntel"
 ````
 
-If logging is configured correctly, one JSON line appears in the container logs.
+If logging is configured correctly, one JSON line appears in the container logs and in `/var/log/nginx/speedtest-result.log`.
 
 - Show platform badge text/logo (for demo environments such as Kubernetes).
 
