@@ -1439,7 +1439,7 @@ window.onload = function() {
       if (!resultLogEnabled && !debugLogEnabled) {
         return;
       }
-      var logURL = typeof speedTestResultLogURL === "string" ? speedTestResultLogURL : "/";
+      var logURL = typeof speedTestResultLogURL === "string" ? speedTestResultLogURL : "/speedtest-result";
       var params = [
         "speedtest_result=1",
         "d=" + encodeURIComponent(downloadSpeed.toFixed(3)),

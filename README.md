@@ -148,7 +148,7 @@ To enable port changes, set the `CHANGE_CONTAINER_PORTS` environment variable to
 
 `ENABLE_SPEEDTEST_DEBUG_LOG=true`
 
-When `ENABLE_SPEEDTEST_RESULT_LOG=true`, the browser sends non-personal speed test metrics to `/?speedtest_result=1`, and NGINX writes one JSON log line to both stdout and `/var/log/nginx/speedtest-result.log`.
+When `ENABLE_SPEEDTEST_RESULT_LOG=true`, the browser sends non-personal speed test metrics to `/speedtest-result?speedtest_result=1`, and NGINX writes one JSON log line to both stdout and `/var/log/nginx/speedtest-result.log`.
 
 When `ENABLE_SPEEDTEST_DEBUG_LOG=true`, the browser also sends debug fields, and NGINX uses a detailed JSON log format that includes client IP, forwarded IP, OS, platform, and user agent. Use this only for troubleshooting.
 
@@ -171,8 +171,8 @@ The JSON log format and conditional `access_log` are defined in `/etc/nginx/ngin
 Quick check:
 
 ````bash
-curl "http://YOUR-SERVER-IP:3000/?speedtest_result=1&d=100&u=50&p=3&brtt=20&j=1&os=macOS&platform=MacIntel"
-curl "http://YOUR-SERVER-IP:3000/?speedtest_result=1&speedtest_debug=1&d=100&u=50&p=3&brtt=20&j=1&os=macOS&platform=MacIntel&ua=debug"
+curl "http://YOUR-SERVER-IP:3000/speedtest-result?speedtest_result=1&d=100&u=50&p=3&brtt=20&j=1&os=macOS&platform=MacIntel"
+curl "http://YOUR-SERVER-IP:3000/speedtest-result?speedtest_result=1&speedtest_debug=1&d=100&u=50&p=3&brtt=20&j=1&os=macOS&platform=MacIntel&ua=debug"
 ````
 
 If logging is configured correctly, one JSON line appears in the container logs and in `/var/log/nginx/speedtest-result.log`.
