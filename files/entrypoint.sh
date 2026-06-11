@@ -122,11 +122,16 @@ sed -i "s/__PLATFORM_LOGO_SRC_DARK__/${escaped_platform_logo_src_dark}/g" "${IND
 sed -i "s/__PLATFORM_LOGO2_SRC_LIGHT__/${escaped_platform_logo2_src_light}/g" "${INDEX_HTML}"
 sed -i "s/__PLATFORM_LOGO2_SRC_DARK__/${escaped_platform_logo2_src_dark}/g" "${INDEX_HTML}"
 
-if [ "$ENABLE_SPEEDTEST_RESULT_LOG" = "true" ] || [ "$ENABLE_SPEEDTEST_RESULT_LOG" = "True" ]; then
+case "$ENABLE_SPEEDTEST_RESULT_LOG" in
+  true|True|TRUE|1|yes|Yes|YES)
   sed -i "s/__ENABLE_SPEEDTEST_RESULT_LOG__/true/g" "${INDEX_HTML}"
-else
+  echo "Speedtest result logging enabled"
+  ;;
+  *)
   sed -i "s/__ENABLE_SPEEDTEST_RESULT_LOG__/false/g" "${INDEX_HTML}"
-fi
+  echo "Speedtest result logging disabled"
+  ;;
+esac
 
 if [ "$ALLOW_ONLY" ]; then
 

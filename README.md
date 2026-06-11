@@ -154,6 +154,14 @@ Example log line:
 {"time":"2026-06-11T12:34:56+00:00","client_ip":"10.0.0.10","xff":"203.0.113.10","method":"GET","download_mbps":"945.123","upload_mbps":"512.456","ping_ms":"3.2","browser_rtt_ms":"50","jitter_ms":"0.8","download_mb":"1420.000","upload_mb":"768.000","os":"macOS","platform":"MacIntel","user_agent":"Mozilla/5.0 ...","http_user_agent":"Mozilla/5.0 ...","request_id":"..."}
 ````
 
+Quick check:
+
+````bash
+curl "http://YOUR-SERVER-IP:3000/speedtest-log?d=100&u=50&p=3&brtt=20&j=1&os=macOS&platform=MacIntel"
+````
+
+If logging is configured correctly, one JSON line appears in the container logs.
+
 - Show platform badge text/logo (for demo environments such as Kubernetes).
 
 `PLATFORM_NAME=Amazon EKS`

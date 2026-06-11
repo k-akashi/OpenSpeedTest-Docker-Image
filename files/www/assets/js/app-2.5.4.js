@@ -1032,11 +1032,12 @@ window.onload = function() {
             var circleSVG2 = document.getElementById("resultsData");
             circleSVG2.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", saveTestData);
             circleSVG2.setAttribute("target", "_blank");
+            logSpeedTestResult();
             if (saveData) {
               ServerConnect(5);
             }
-            logSpeedTestResult();
           } else {
+            logSpeedTestResult();
             ServerConnect(3);
           }
           Status = "busy";
@@ -1452,8 +1453,16 @@ window.onload = function() {
         "ua=" + encodeURIComponent(userAgentString)
       ].join("&");
       var separator = logURL.indexOf("?") === -1 ? "?" : "&";
+      var requestURL = logURL + separator + params + "&t=" + Date.now();
+      if (window.navigator.sendBeacon && window.navigator.sendBeacon(requestURL, "")) {
+        return;
+      }
+      if (window.fetch) {
+        fetch(requestURL, { method: "GET", keepalive: true }).catch(function() {});
+        return;
+      }
       var request = new Image();
-      request.src = logURL + separator + params + "&t=" + Date.now();
+      request.src = requestURL;
     };
   };
   OpenSpeedTest.Start = function() {
