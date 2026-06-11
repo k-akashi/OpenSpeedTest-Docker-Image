@@ -113,6 +113,15 @@ case "$ENABLE_SPEEDTEST_RESULT_LOG" in
   ;;
 esac
 
+case "$ENABLE_SPEEDTEST_DEBUG_LOG" in
+  true|True|TRUE|1|yes|Yes|YES)
+  sed -i "s/__ENABLE_SPEEDTEST_DEBUG_LOG__/true/g" "${INDEX_HTML}"
+  ;;
+  *)
+  sed -i "s/__ENABLE_SPEEDTEST_DEBUG_LOG__/false/g" "${INDEX_HTML}"
+  ;;
+esac
+
 if [ "$has_config" = true ] && [ "$ALLOW_ONLY" ]; then
 
 allow_only=${ALLOW_ONLY}

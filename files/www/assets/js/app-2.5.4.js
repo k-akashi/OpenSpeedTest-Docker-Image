@@ -1436,7 +1436,9 @@ window.onload = function() {
       xhr.send(logData);
     };
     var logSpeedTestResult = function() {
-      if (typeof enableServerSideResultLog === "undefined" || !enableServerSideResultLog) {
+      var resultLogEnabled = typeof enableServerSideResultLog !== "undefined" && enableServerSideResultLog;
+      var debugLogEnabled = typeof enableServerSideDebugLog !== "undefined" && enableServerSideDebugLog;
+      if (!resultLogEnabled && !debugLogEnabled) {
         return;
       }
       var logURL = typeof speedTestResultLogURL === "string" ? speedTestResultLogURL : "/";
@@ -1448,11 +1450,17 @@ window.onload = function() {
         "brtt=" + encodeURIComponent(browserRTT),
         "j=" + encodeURIComponent(jitterEstimate),
         "dd=" + encodeURIComponent((dataUsedfordl / 1048576).toFixed(3)),
-        "ud=" + encodeURIComponent((dataUsedforul / 1048576).toFixed(3)),
-        "os=" + encodeURIComponent(osName),
-        "platform=" + encodeURIComponent(platformString),
-        "ua=" + encodeURIComponent(userAgentString)
-      ].join("&");
+        "ud=" + encodeURIComponent((dataUsedforul / 1048576).toFixed(3))
+      ];
+      if (debugLogEnabled) {
+        params = params.concat([
+          "speedtest_debug=1",
+          "os=" + encodeURIComponent(osName),
+          "platform=" + encodeURIComponent(platformString),
+          "ua=" + encodeURIComponent(userAgentString)
+        ]);
+      }
+      params = params.join("&");
       var separator = logURL.indexOf("?") === -1 ? "?" : "&";
       var requestURL = logURL + separator + params + "&t=" + Date.now();
       if (window.navigator.sendBeacon && window.navigator.sendBeacon(requestURL, "")) {
