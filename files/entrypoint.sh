@@ -4,13 +4,13 @@ has_config=false
 [ -f "$CONFIG" ] && has_config=true
 
 ip a | egrep -q 'inet6 '
-if [ "$has_config" = true ] && [[ $? -ne 0 ]]; then
+if [ "$has_config" = true ] && [ $? -ne 0 ]; then
   # IPv6 not enabled
   sed -i '/listen \[::\]:300/d' ${CONFIG}
 fi
 
 ip a | egrep -q 'inet '
-if [ "$has_config" = true ] && [[ $? -ne 0 ]]; then
+if [ "$has_config" = true ] && [ $? -ne 0 ]; then
   # IPv4 not enabled
   sed -i '/listen 300/d' ${CONFIG}
 fi
@@ -126,16 +126,17 @@ if [ "$has_config" = true ] && [ "$ALLOW_ONLY" ]; then
 
 allow_only=${ALLOW_ONLY}
 
-IFS=';' domains=$(echo "$allow_only" | tr ';' '\n')
-
 map_config="map \$http_origin \$allowed_origin {
     default 0;
 "
-while IFS= read -r line; do
+old_ifs="$IFS"
+IFS=';'
+for line in $allow_only; do
     escaped_domain=$(echo "$line" | sed 's/\./\\./g')
     map_config="$map_config    \"~^https?://(www\.)?($escaped_domain)\$\" 1;
 "
-done < <(printf '%s\n' "$domains")
+done
+IFS="$old_ifs"
 
 map_config="$map_config}"
 
@@ -146,6 +147,8 @@ nginx_block="if (\$allowed_origin = 0) { return 444; }"
 if grep -q "$pattern" "$nginx_conf_path"; then
     :
 else
+    map_config_file="/tmp/openspeedtest-map-config"
+    printf '%s\n' "$map_config" > "$map_config_file"
     while IFS= read -r line; do
 sed -i '/^\s*http\s*{/ {
     :a;
@@ -153,7 +156,7 @@ sed -i '/^\s*http\s*{/ {
     /\s*}\s*$/!ba;
     s|\(}\)|'"$line"'\n\1|
 }' "$nginx_conf_path"
-    done < <(printf '%s\n' "$map_config")
+    done < "$map_config_file"
         if [ $? -eq 0 ]; then
             if grep -q "$nginx_block" "$CONFIG"; then
             :
@@ -178,7 +181,12 @@ if [ "$has_config" = true ] && [ "$DOMAIN_NAME" ]; then
 sed -i "/\bYOURDOMAIN\b/c\ server_name _ localhost ${DOMAIN_NAME};" "${CONFIG}"
 fi
 
-nginx -g 'daemon off;' & sleep 5
+nginx -g 'daemon off;' &
+nginx_pid=$!
+sleep 5
+if ! kill -0 "$nginx_pid" 2>/dev/null; then
+  exit 1
+fi
 
 if [ "$ENABLE_LETSENCRYPT" = True ] && [ "$DOMAIN_NAME" ] && [ "$USER_EMAIL" ]; then
 
@@ -201,4 +209,4 @@ fi
 
 crond -b -l 5
 
-tail -f /dev/null
+wait "$nginx_pid"
